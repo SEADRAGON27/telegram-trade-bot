@@ -1,0 +1,25 @@
+{
+  "name": "telegram-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "pet project for github",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nikita",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "coingecko-api": "^1.0.10",
+    "curl": "^0.1.4",
+    "dotenv": "^16.3.1",
+    "mongodb": "^5.7.0",
+    "node-fetch": "^3.3.1",
+    "telegraf": "^4.12.2",
+    "twilio": "^4.14.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
