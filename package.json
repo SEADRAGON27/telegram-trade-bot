@@ -15,7 +15,6 @@
     "curl": "^0.1.4",
     "dotenv": "^16.3.1",
     "mongodb": "^5.7.0",
-    "node-fetch": "^3.3.1",
     "telegraf": "^4.12.2",
     "twilio": "^4.14.1"
   },
