@@ -9,7 +9,7 @@ import { wizardSceneTrade } from "./tradingScenes/handler.js";
 import { ordersScene } from "./tradingScenes/orders.js";
 import { withdrawScene } from "./tradingScenes/withdraw.js";
 import { listOrdersScene } from "./tradingScenes/listaAllOrders.js";
-import { cancelOrders } from "./tradingScenes/cancelOrders.js";
+import { cancelOrdersScene } from "./tradingScenes/cancelOrders.js";
 import { changeDataAuthScene } from "./tradingScenes/changeDataAuth.js";
 
 function startBot() {
@@ -23,7 +23,7 @@ function startBot() {
     ordersScene,
     withdrawScene,
     listOrdersScene,
-    cancelOrders,
+    cancelOrdersScene,
     changeDataAuthScene,
   ]);
   bot.use(session());
