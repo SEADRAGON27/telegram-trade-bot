@@ -3,7 +3,7 @@ import { Markup, Scenes } from "telegraf";
 import { listAllOrders, cancelOrder } from "../../api.js";
 import { extractFromDB, findUserInfo } from "../db.js";
 import { getDate } from "../date.js";
-export const cancelOrders = new Scenes.WizardScene(
+export const cancelOrdersScene = new Scenes.WizardScene(
   "cancelOrders",
   (ctx) => {
     ctx.reply(
