@@ -1,7 +1,8 @@
+import "dotenv/config"
 import { Scenes, Telegraf, session } from "telegraf";
 import { recordToDB, extractFromDB, findUserInfo } from "./db.js";
 import { wizardSceneTrade } from "./tradingScenes/handler.js";
-
+import { hashPassword } from "../lib/argon2.js";
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const stage = new Scenes.Stage([wizardSceneTrade]);
 bot.use(session());
@@ -26,7 +27,7 @@ export const SceneTradingAutorization = new Scenes.WizardScene(
     }
   },
   (ctx) => {
-    ctx.scene.state.phrase = ctx.message.text;
+    ctx.scene.state.phrase = await hashPassword(ctx.message.text);;
     ctx.reply("✍Write apiSecret");
     ctx.wizard.next();
   },
