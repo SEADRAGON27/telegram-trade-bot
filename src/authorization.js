@@ -26,7 +26,7 @@ export const SceneTradingAutorization = new Scenes.WizardScene(
       ctx.scene.leave();
     }
   },
-  (ctx) => {
+    async (ctx) => {
     ctx.scene.state.phrase = await hashPassword(ctx.message.text);;
     ctx.reply("✍Write apiSecret");
     ctx.wizard.next();
