@@ -3,10 +3,7 @@ import { Scenes, Telegraf, session } from "telegraf";
 import { recordToDB, extractFromDB, findUserInfo } from "./db.js";
 import { wizardSceneTrade } from "./tradingScenes/handler.js";
 import { hashPassword } from "../lib/argon2.js";
-const bot = new Telegraf(process.env.BOT_TOKEN);
-const stage = new Scenes.Stage([wizardSceneTrade]);
-bot.use(session());
-bot.use(stage.middleware());
+
 
 export const SceneTradingAutorization = new Scenes.WizardScene(
   "autorization",
