@@ -5,16 +5,7 @@ import { withdrawScene } from "./withdraw.js";
 import { listOrdersScene } from "./listaAllOrders.js";
 import { cancelOrders } from "./cancelOrders.js";
 import { changeDataAuthScene } from "./changeDataAuth.js";
-const bot = new Telegraf(process.env.BOT_TOKEN);
-const stage = new Scenes.Stage([
-  ordersScene,
-  withdrawScene,
-  listOrdersScene,
-  cancelOrders,
-  changeDataAuthScene,
-]);
-bot.use(session());
-bot.use(stage.middleware());
+
 export const wizardSceneTrade = new Scenes.WizardScene(
   "tradeScene",
   (ctx) => {
