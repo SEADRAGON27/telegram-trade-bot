@@ -29,8 +29,8 @@ function startBot() {
   bot.use(session());
   bot.use(stage.middleware());
   
-  bot.command("start", (ctx) => {
-    ctx.reply(
+  bot.command("start", async (ctx) => {
+    await ctx.reply(
       "Добро пожаловать, выберите команду:",
       Markup.inlineKeyboard([
         [Markup.button.callback("💵Get prices of cryptocurrencies", "prices")],
@@ -42,23 +42,23 @@ function startBot() {
   });
   
  
-  bot.on("message", (ctx) => {
-    ctx.reply("No such answer!");
+  bot.on("message", async (ctx) => {
+    await ctx.reply("No such answer!");
   });
 
-  bot.action("prices", (ctx) => {
-    ctx.scene.enter("getPricesCrypto");
+  bot.action("prices", async (ctx) => {
+    await ctx.scene.enter("getPricesCrypto");
   });
 
-  bot.action("notification", (ctx) => {
-    ctx.scene.enter("getNotification");
+  bot.action("notification", async (ctx) => {
+    await ctx.scene.enter("getNotification");
   });
 
-  bot.action("delete", (ctx) => {
-    ctx.scene.enter("deleteNotification");
+  bot.action("delete", async (ctx) => {
+    await ctx.scene.enter("deleteNotification");
   });
-  bot.action("trade", (ctx) => {
-    ctx.scene.enter("autorization");
+  bot.action("trade", async (ctx) => {
+    await ctx.scene.enter("autorization");
   });
   
   setInterval(handler, 50000);
