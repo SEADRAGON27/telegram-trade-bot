@@ -40,7 +40,7 @@ export const cancelOrdersScene = new Scenes.WizardScene(
       const params = ctx.scene.state;
       const data = findUserInfo(ctx.from.id);
       try {
-        const responce = await extractFromDB("usersKey", data);
+        const responce = await DB("getData", data,"userKeys");
         const orders = await listAllOrders(
           responce[0].apiSecret,
           responce[0].apiKey,
