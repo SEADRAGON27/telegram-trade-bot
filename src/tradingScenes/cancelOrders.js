@@ -5,8 +5,8 @@ import { extractFromDB, findUserInfo } from "../db.js";
 import { getDate } from "../date.js";
 export const cancelOrdersScene = new Scenes.WizardScene(
   "cancelOrders",
-  (ctx) => {
-    ctx.reply(
+  async (ctx) => {
+   await ctx.reply(
       "🤔Choose orders type",
       Markup.inlineKeyboard([
         [Markup.button.callback("💥Spot Trading", "spot")],
@@ -20,7 +20,7 @@ export const cancelOrdersScene = new Scenes.WizardScene(
   async (ctx) => {
     const userPromt = ctx.message;
     if (userPromt) {
-      ctx.reply("⛔ Please use the buttons to make a selection.");
+      await ctx.reply("⛔ Please use the buttons to make a selection.");
     } else {
       ctx.scene.state.status = "active";
       ctx.scene.state.typeOfOrders = "limit";
@@ -72,7 +72,7 @@ export const cancelOrdersScene = new Scenes.WizardScene(
           }
         }
       } catch (err) {
-        ctx.reply(
+        await ctx.reply(
           `😓Sorry,something went wrong, make sure that the registration data is written correctly.`
         );
         ctx.scene.leave();
@@ -83,6 +83,7 @@ export const cancelOrdersScene = new Scenes.WizardScene(
     const orderId = ctx.message.text;
     const data = ctx.scene.state;
     await cancelOrder(data, orderId);
-    ctx.reply("✅Order is canceld");
+    await ctx.reply("✅Order is canceld");
+    ctx.scene.leave()
   }
 );
