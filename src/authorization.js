@@ -13,24 +13,24 @@ export const SceneTradingAutorization = new Scenes.WizardScene(
     try {
       const res = await extractFromDB("usersKey", data);
       if (res.length <= 0) {
-        ctx.reply("For introducing with с API Kucoin.\n✍Write passphrase:");
+        await ctx.reply("For introducing with с API Kucoin.\n✍Write passphrase:");
         ctx.wizard.next();
       } else {
         ctx.scene.enter("tradeScene");
       }
     } catch (err) {
-      ctx.reply(`😓Sorry,We have problem in our application.`);
+      await ctx.reply(`😓Sorry,We have problem in our application.`);
       ctx.scene.leave();
     }
   },
     async (ctx) => {
     ctx.scene.state.phrase = await hashPassword(ctx.message.text);;
-    ctx.reply("✍Write apiSecret");
+    await ctx.reply("✍Write apiSecret");
     ctx.wizard.next();
   },
-  (ctx) => {
+  async (ctx) => {
     ctx.scene.state.secret = ctx.message.text;
-    ctx.reply("Write apiKey");
+    await ctx.reply("Write apiKey");
     ctx.wizard.next();
   },
   async (ctx) => {
@@ -43,9 +43,10 @@ export const SceneTradingAutorization = new Scenes.WizardScene(
         apiKey: ctx.scene.state.apiKey,
       };
       await recordToDB(data);
-      ctx.scene.enter("tradeScene");
+      await ctx.scene.enter("tradeScene");
+      ctx.scene.leave();
     } catch (err) {
-      ctx.reply(`😓Sorry,We have problem in our application.`);
+      await ctx.reply(`😓Sorry,We have problem in our application.`);
       ctx.scene.leave();
     }
   }
