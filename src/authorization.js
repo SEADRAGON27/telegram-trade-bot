@@ -16,7 +16,7 @@ export const SceneTradingAutorization = new Scenes.WizardScene(
         await ctx.reply("For introducing with с API Kucoin.\n✍Write passphrase:");
         ctx.wizard.next();
       } else {
-        ctx.scene.enter("tradeScene");
+        await ctx.scene.enter("tradeScene");
       }
     } catch (err) {
       await ctx.reply(`😓Sorry,We have problem in our application.`);
