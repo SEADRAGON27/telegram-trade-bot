@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Markup, Scenes } from "telegraf";
 import { listAllOrders, cancelOrder } from "../../api.js";
-import { extractFromDB, findUserInfo } from "../db.js";
+import { DB, findUserInfo } from "../db.js";
 import { getDate } from "../date.js";
 export const cancelOrdersScene = new Scenes.WizardScene(
   "cancelOrders",
