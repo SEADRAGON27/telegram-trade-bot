@@ -24,17 +24,23 @@ export const SceneTradingAutorization = new Scenes.WizardScene(
     }
   },
     async (ctx) => {
-    ctx.scene.state.phrase = await hashPassword(ctx.message.text);;
+    ctx.message.text === "string"
+      ? await hashPassword(ctx.message.text)
+      : await ctx.reply("Write correct passPhrase!");
     await ctx.reply("✍Write apiSecret");
     ctx.wizard.next();
   },
   async (ctx) => {
-    ctx.scene.state.secret = ctx.message.text;
-    await ctx.reply("Write apiKey");
-    ctx.wizard.next();
-  },
+    ctx.message.text === "string"?
+      ctx.scene.state.secret = ctx.message.text:
+      await ctx.reply("Write correct apiSecret!");
+      await ctx.reply("Write apiKey");
+      ctx.wizard.next();
+   },
   async (ctx) => {
-    ctx.scene.state.apiKey = ctx.message.text;
+     ctx.message.text === "string"?
+      ctx.scene.state.apiKey = ctx.message.text:
+      await ctx.reply("Write correct apiKey!");
     try {
       const data = {
         userId: ctx.from.id,
