@@ -1,11 +1,11 @@
 import { Scenes, Markup } from "telegraf";
 import { pricesCryptoCurrancy } from "../api.js";
-import { recordToDB } from "../db.js";
+import { DB } from "../db.js";
 
 export const wizardSceneNotification = new Scenes.WizardScene(
   "getNotification",
-  (ctx) => {
-    ctx.reply("✍ Write cryptocurrencies name(bitcoin,monero,ripple):");
+ async (ctx) => {
+    await ctx.reply("✍ Write cryptocurrencies name(bitcoin,monero,ripple):");
     ctx.wizard.next();
   },
   async (ctx) => {
@@ -13,28 +13,28 @@ export const wizardSceneNotification = new Scenes.WizardScene(
     const res = await pricesCryptoCurrancy(userPrompt);
     if (+res) {
       ctx.scene.state.cryptocurrancy = userPrompt;
-      ctx.reply("✍ Write Price");
+      await ctx.reply("✍ Write Price");
       ctx.wizard.next();
     } else {
-      ctx.reply("⛔Cryptocurrency not found, please re-enter the text");
+      await ctx.reply("⛔Cryptocurrency not found, please re-enter the text");
     }
   },
-  (ctx) => {
+  async (ctx) => {
     const userPrompt = ctx.message.text;
     if (+userPrompt) {
       ctx.scene.state.price = +userPrompt;
-      ctx.reply('✍ Add comment for notice,\nwrite "no" if you don\'t want');
+      await ctx.reply('✍ Add comment for notice,\nwrite "no" if you don\'t want');
       ctx.wizard.next();
     } else {
-      ctx.reply("⛔You can write only numbers, please re-enter the text");
+      await ctx.reply("⛔You can write only numbers, please re-enter the text");
     }
   },
-  (ctx) => {
+ async (ctx) => {
     const userPrompt = ctx.message.text;
     userPrompt != "no" ? (ctx.scene.state.notification = userPrompt) : "";
     ctx.scene.state.userId = ctx.from.id;
 
-    ctx.reply(
+   async  ctx.reply(
       `🤔Choose how to send the notification`,
       Markup.inlineKeyboard([
         [Markup.button.callback("⚡Telegram", "telegram")],
@@ -49,14 +49,14 @@ export const wizardSceneNotification = new Scenes.WizardScene(
       try {
         ctx.scene.state.telegram = true;
         await recordToDB(ctx.scene.state, "users");
-        ctx.reply("✅the notice is registrated");
+        await ctx.reply("✅the notice is registrated");
         ctx.scene.leave();
       } catch (error) {
-        ctx.reply(`😓Sorry,We have problem in our application.`);
+        await ctx.reply(`😓Sorry,We have problem in our application.`);
         ctx.scene.leave();
       }
     } else {
-      ctx.reply("✍ Write phone number");
+      await ctx.reply("✍ Write phone number");
       ctx.scene.state.callbackQuery = ctx.callbackQuery.data;
     }
 
@@ -68,7 +68,7 @@ export const wizardSceneNotification = new Scenes.WizardScene(
     const phoneRegex = /^(\+\d{1,3}\s?)?(\d{10})$/;
     phoneRegex.test(phoneNumber)
       ? (ctx.scene.state.phone = phoneNumber)
-      : ctx.reply("⛔Write correct phone number");
+      : await ctx.reply("⛔Write correct phone number");
     if (callbackQuery == "sms") {
       ctx.scene.state.sms = true;
     } else if (callbackQuery == "sms/telegram") {
@@ -76,11 +76,11 @@ export const wizardSceneNotification = new Scenes.WizardScene(
     }
     delete ctx.scene.state.callbackQuery;
     try {
-      await recordToDB(ctx.scene.state, "users");
-      ctx.reply("✅the notice is registrated");
+      await DB("recordData",ctx.scene.state, "users");
+      await ctx.reply("✅the notice is registrated");
       ctx.scene.leave();
     } catch (error) {
-      ctx.reply("😓Sorry,We have problem in our application.");
+     await  ctx.reply("😓Sorry,We have problem in our application.");
       ctx.scene.leave();
     }
   }
