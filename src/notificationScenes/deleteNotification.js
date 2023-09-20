@@ -17,11 +17,11 @@ export const wizardSceneDelete = new Scenes.WizardScene(
     const cryptocurrancy = ctx.scene.state.cryptocurrancy;
     try {
       const data = deleteUserInfo(cryptocurrancy,price,id)
-      await deleteFromDB(data, "users");
+      await DB("deleteData",data, "users");
       await ctx.reply("✅Notification has been removed.");
       ctx.scene.leave();
     } catch (err) {
-      ctx.reply(`😓Sorry,We have problem in our application.`);
+      await ctx.reply(`😓Sorry,We have problem in our application.`);
       ctx.scene.leave();
     }
   }
