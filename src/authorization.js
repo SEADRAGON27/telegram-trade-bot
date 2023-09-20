@@ -1,6 +1,6 @@
 import "dotenv/config"
 import { Scenes, Telegraf, session } from "telegraf";
-import { recordToDB, extractFromDB, findUserInfo } from "./db.js";
+import { DB, findUserInfo } from "./db.js";
 import { wizardSceneTrade } from "./tradingScenes/handler.js";
 import { hashPassword } from "../lib/argon2.js";
 
@@ -11,7 +11,7 @@ export const SceneTradingAutorization = new Scenes.WizardScene(
   async (ctx) => {
     const data = findUserInfo(ctx.from.id);
     try {
-      const res = await extractFromDB("usersKey", data);
+      const res = await DB("getData", data,"usersKey");
       if (res.length <= 0) {
         await ctx.reply("For introducing with с API Kucoin.\n✍Write passphrase:");
         ctx.wizard.next();
@@ -42,7 +42,7 @@ export const SceneTradingAutorization = new Scenes.WizardScene(
         apiSecret: ctx.scene.state.secret,
         apiKey: ctx.scene.state.apiKey,
       };
-      await recordToDB(data);
+      await   DB("recordData",data,"usersKey');
       await ctx.scene.enter("tradeScene");
       ctx.scene.leave();
     } catch (err) {
