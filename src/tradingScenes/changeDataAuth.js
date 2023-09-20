@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { Markup, Scenes } from "telegraf";
-import { extractFromDB, findUserInfo, updateDataDB } from "../db.js";
+import { DB, findUserInfo, updateDataDB } from "../db.js";
 export const changeDataAuthScene = new Scenes.WizardScene(
   "changeDataAuth",
   async (ctx) => {
