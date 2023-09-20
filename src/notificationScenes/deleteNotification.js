@@ -1,14 +1,14 @@
 import { Scenes } from "telegraf";
-import { deleteFromDB, deleteUserInfo } from "../db.js";
+import { DB, deleteUserInfo } from "../db.js";
 export const wizardSceneDelete = new Scenes.WizardScene(
   "deleteNotification",
-  (ctx) => {
-    ctx.reply("✍ Write cryptocurrancy youre notification:");
+  async (ctx) => {
+    await ctx.reply("✍ Write cryptocurrancy youre notification:");
     ctx.wizard.next();
   },
-  (ctx) => {
+ async (ctx) => {
     ctx.scene.state.cryptocurrancy = ctx.message.text;
-    ctx.reply("✍ Write the set price in the notice:");
+    await ctx.reply("✍ Write the set price in the notice:");
     ctx.wizard.next();
   },
   async (ctx) => {
@@ -18,7 +18,7 @@ export const wizardSceneDelete = new Scenes.WizardScene(
     try {
       const data = deleteUserInfo(cryptocurrancy,price,id)
       await deleteFromDB(data, "users");
-      ctx.reply("✅Notification has been removed.");
+      await ctx.reply("✅Notification has been removed.");
       ctx.scene.leave();
     } catch (err) {
       ctx.reply(`😓Sorry,We have problem in our application.`);
