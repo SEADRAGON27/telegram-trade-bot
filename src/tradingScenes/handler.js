@@ -8,8 +8,8 @@ import { changeDataAuthScene } from "./changeDataAuth.js";
 
 export const wizardSceneTrade = new Scenes.WizardScene(
   "tradeScene",
-  (ctx) => {
-    ctx.reply(
+  async (ctx) => {
+    await ctx.reply(
       "🤔Choose command:",
       Markup.inlineKeyboard([
         [Markup.button.callback("⚡Open/Close order", "open/close")],
@@ -21,29 +21,30 @@ export const wizardSceneTrade = new Scenes.WizardScene(
     );
     ctx.wizard.next();
   },
-  (ctx) => {
+ async (ctx) => {
     const userInput = ctx.message;
 
     if (userInput) {
-      ctx.reply("⛔ Please use the buttons to make a selection.");
+      await ctx.reply("⛔ Please use the buttons to make a selection.");
     } else {
       switch (ctx.callbackQuery.data) {
         case "open/close":
-          ctx.scene.enter("openOrder");
+          await ctx.scene.enter("openOrder");
           break;
         case "withdraw":
-          ctx.scene.enter("withdraw");
+          await ctx.scene.enter("withdraw");
           break;
         case "orders":
-          ctx.scene.enter("listAllOrders");
+          await ctx.scene.enter("listAllOrders");
           break;
         case "cancel":
-          ctx.scene.enter("cancelOrders");
+          await ctx.scene.enter("cancelOrders");
           break;
         case "change":
-          ctx.scene.enter("changeDataAuth");
+          await ctx.scene.enter("changeDataAuth");
           break;
       }
+     ctx.scene.leave()
     }
   }
 );
