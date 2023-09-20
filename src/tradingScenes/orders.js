@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Scenes, Markup } from "telegraf";
 import { openOrder, pricesCryptoCurrancy } from "../../api.js";
-import { extractFromDB, findUserInfo } from "../db.js";
+import { DB, findUserInfo } from "../db.js";
 export const ordersScene = new Scenes.WizardScene(
   "openOrder",
   async (ctx) => {
