@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Scenes } from "telegraf";
 import { withdraw } from "../../api.js";
-import { extractFromDB, findUserInfo } from "../db.js";
+import { DB, findUserInfo } from "../db.js";
 export const withdrawScene = new Scenes.WizardScene(
   "withdraw",
   async (ctx) => {
