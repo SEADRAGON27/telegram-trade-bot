@@ -4,8 +4,8 @@ import { openOrder, pricesCryptoCurrancy } from "../../api.js";
 import { extractFromDB, findUserInfo } from "../db.js";
 export const ordersScene = new Scenes.WizardScene(
   "openOrder",
-  (ctx) => {
-    ctx.reply(
+  async (ctx) => {
+    await ctx.reply(
       "🤔Select type of trading",
       Markup.inlineKeyboard([
         [Markup.button.callback("⚡Margin", "mar")],
@@ -14,10 +14,10 @@ export const ordersScene = new Scenes.WizardScene(
     );
     ctx.wizard.next();
   },
-  (ctx) => {
+  async (ctx) => {
     const userPromt = ctx.message;
     if (userPromt) {
-      ctx.reply("⛔ Please use the buttons to make a selection.");
+      await ctx.reply("⛔ Please use the buttons to make a selection.");
     } else {
       switch (ctx.callbackQuery.data) {
         case "spt":
@@ -27,28 +27,28 @@ export const ordersScene = new Scenes.WizardScene(
           ctx.scene.state.button = "margin/order";
           break;
       }
-      ctx.reply(" 🧠 Come up with clientOid(max 40 symbols)");
+      await ctx.reply(" 🧠 Come up with clientOid(max 40 symbols)");
       ctx.wizard.next();
     }
   },
-  (ctx) => {
+  async (ctx) => {
     const clientOid = ctx.message.text;
     if (clientOid.length > 40) {
-      ctx.reply("✍ You can write max 40 symbols: ");
+      await ctx.reply("✍ You can write max 40 symbols: ");
     } else {
       ctx.scene.state.clientOid = clientOid;
-      ctx.reply("😲 Do you want 'buy' or 'sell'?");
+      await ctx.reply("😲 Do you want 'buy' or 'sell'?");
       ctx.wizard.next();
     }
   },
-  (ctx) => {
+  async (ctx) => {
     const kindOrder = ctx.message.text;
     if (kindOrder == "buy" || kindOrder == "sell") {
       ctx.scene.state.kindOrder = kindOrder;
-      ctx.reply("✍ Write cryptocurrencies name(bitcoin,monero,ripple)");
+      await ctx.reply("✍ Write cryptocurrencies name(bitcoin,monero,ripple)");
       ctx.wizard.next();
     } else {
-      ctx.reply("⛔ You must write 'buy' or 'sell':");
+     await ctx.reply("⛔ You must write 'buy' or 'sell':");
     }
   },
   async (ctx) => {
@@ -56,46 +56,46 @@ export const ordersScene = new Scenes.WizardScene(
     const res = await pricesCryptoCurrancy(cryptoCurrancy);
     if (+res) {
       ctx.scene.state.cryptoCurrancy = cryptoCurrancy;
-      ctx.reply("✍ Write trading pair(format:ETH-USDT):");
+     await ctx.reply("✍ Write trading pair(format:ETH-USDT):");
       ctx.wizard.next();
     } else {
-      ctx.reply("⛔Cryptocurrency not found, please re-enter the text");
+     await ctx.reply("⛔Cryptocurrency not found, please re-enter the text");
     }
   },
-  (ctx) => {
+  async (ctx) => {
     const symbolRegex = /^[A-Z]{3,}-[A-Z]{3,}$/;
     const tradingPair = ctx.message.text;
     if (symbolRegex.test(tradingPair)) {
       ctx.scene.state.tradePair = tradingPair;
-      ctx.reply("✍ Choose type of trading'limit' or 'market':");
+      await ctx.reply("✍ Choose type of trading'limit' or 'market':");
       ctx.wizard.next();
     } else {
-      ctx.reply("⛔ You must write correct trading pairs");
+      await ctx.reply("⛔ You must write correct trading pairs");
     }
   },
-  (ctx) => {
+ async (ctx) => {
     const typeOfTrading = ctx.message.text;
     if (typeOfTrading == "limit") {
       ctx.scene.state.typeOfTrading = typeOfTrading;
-      ctx.reply("✍ Set the trigger price of the order in USDT");
+      await ctx.reply("✍ Set the trigger price of the order in USDT");
       ctx.wizard.next();
     } else if (typeOfTrading == "market") {
       ctx.scene.state.typeOfTrading = typeOfTrading;
-      ctx.reply("✍ Write size position in USDT");
+     await ctx.reply("✍ Write size position in USDT");
       ctx.wizard.selectStep(8);
     } else {
-      ctx.reply(" ⛔You must write words 'limit' or 'market'");
+      await ctx.reply(" ⛔You must write words 'limit' or 'market'");
     }
   },
-  (ctx) => {
+  async (ctx) => {
     const price = ctx.message.text;
     const regex = /^[0-9]+$/;
     if (regex.test(price)) {
       ctx.scene.state.price = price;
-      ctx.reply("✍ Write size position in USDT.");
+      await ctx.reply("✍ Write size position in USDT.");
       ctx.wizard.next();
     } else {
-      ctx.reply("⛔You must write numbers");
+      await ctx.reply("⛔You must write numbers");
     }
   },
   async (ctx) => {
@@ -108,7 +108,7 @@ export const ordersScene = new Scenes.WizardScene(
       const data = findUserInfo(ctx.from.id);
 
       try {
-        const res = await extractFromDB("usersKey", data);
+        const res = await DB("getData", data,"usersKey");
         await openOrder(
           res[0].apiSecret,
           res[0].apiKey,
@@ -116,16 +116,16 @@ export const ordersScene = new Scenes.WizardScene(
           params,
           apiText
         );
-        ctx.reply("✅Order is registrated!");
+        await ctx.reply("✅Order is registrated!");
         ctx.scene.leave();
       } catch (err) {
-        ctx.reply(
+        await ctx.reply(
           `😓Something went wrong make sure the data is written correctly during registration and API permissions`
         );
         ctx.scene.leave();
       }
     } else {
-      ctx.reply("✍ You must write numbers in USDT");
+      await ctx.reply("✍ You must write numbers in USDT");
     }
   }
 );
