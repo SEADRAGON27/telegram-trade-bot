@@ -3,7 +3,7 @@ import { Telegraf, Markup, session, Scenes } from "telegraf";
 import { wizardScenePrice } from "./tradingScenes/priceCurrancy.js";
 import { wizardSceneNotification } from "./notificationScenes/setNotifications.js";
 import { wizardSceneDelete } from "./notificationScenes/deleteNotification.js";
-import { SceneTradingAutorization } from "./autorization.js";
+import { SceneTradingAutorization } from "./authorization.js";
 import { handler } from "./notificationScenes/notificationHandler.js";
 import { wizardSceneTrade } from "./tradingScenes/handler.js";
 import { ordersScene } from "./tradingScenes/orders.js";
