@@ -41,7 +41,7 @@ export const changeDataAuthScene = new Scenes.WizardScene(
     const typeAuth = ctx.scene.state;
     const data = findUserInfo(ctx.from.id);
     try {
-      const res = await extractFromDB("usersKey", data);
+      const res = await DB("getData",data,"usersKey");
       if (Object.hasOwn(typeAuth, "secret")) {
         await DB(
           { _id: res[0]._id },
