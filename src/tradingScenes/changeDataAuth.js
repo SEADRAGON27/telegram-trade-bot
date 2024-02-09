@@ -44,24 +44,26 @@ export const changeDataAuthScene = new Scenes.WizardScene(
       const res = await DB("getData",data,"usersKey");
       if (Object.hasOwn(typeAuth, "secret")) {
         await DB(
-          { _id: res[0]._id },
+          "updateData",
           { $set: { apiSecret: newData } },
-          "usersKey"
-        );
+          "usersKey",
+          { _id: res[0]._id },
+          );
         await ctx.reply("✅Api secret is changed");
       }
       if (Object.hasOwn(typeAuth, "key")) {
         DB(
-          { _id: res[0]._id },
+          "updateData",
           { $set: { apiKey: newData } },
-          "usersKey"
-        );
+          "usersKey",
+          { _id: res[0]._id }
+          );
         await ctx.reply("✅Api key is changed");
       }
       if (Object.hasOwn(typeAuth, "passPhrase")) {
-        await DB("updateData"
+        await DB("updateData",
           { $set: { passPhrase: newData } },
-          "usersKey"
+          "usersKey",
           { _id: res[0]._id },
         );
         await ctx.reply("✅Passphrase is changed");

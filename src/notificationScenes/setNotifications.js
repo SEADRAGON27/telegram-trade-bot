@@ -34,7 +34,7 @@ export const wizardSceneNotification = new Scenes.WizardScene(
     userPrompt != "no" ? (ctx.scene.state.notification = userPrompt) : "";
     ctx.scene.state.userId = ctx.from.id;
 
-   async  ctx.reply(
+   await ctx.reply(
       `🤔Choose how to send the notification`,
       Markup.inlineKeyboard([
         [Markup.button.callback("⚡Telegram", "telegram")],
