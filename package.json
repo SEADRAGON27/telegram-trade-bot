@@ -5,20 +5,23 @@
   "description": "pet project for github",
   "main": "app.js",
   "scripts": {
+    "start": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Nikita",
   "license": "ISC",
   "dependencies": {
+    "argon2": "^0.40.1",
     "axios": "^1.4.0",
-    "coingecko-api": "^1.0.10",
-    "curl": "^0.1.4",
     "dotenv": "^16.3.1",
     "mongodb": "^5.7.0",
+    "mongoose": "^8.3.2",
+    "path": "^0.12.7",
+    "pino": "^9.0.0",
     "telegraf": "^4.12.2",
     "twilio": "^4.14.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.1.0"
   }
 }

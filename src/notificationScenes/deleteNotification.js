@@ -1,14 +1,17 @@
-import { Scenes } from "telegraf";
-import { DB, deleteUserInfo } from "../db.js";
+import { Scenes } from 'telegraf';
+import { db } from '../db/connection.js';
+import { deleteUserInfo } from '../db/utils.js';
+import { UserNotification } from '../db/models/userNotification.js';
+
 export const wizardSceneDelete = new Scenes.WizardScene(
-  "deleteNotification",
+  'deleteNotification',
   async (ctx) => {
-    await ctx.reply("✍ Write cryptocurrancy youre notification:");
+    await ctx.reply('✍ Write cryptocurrancy youre notification:');
     ctx.wizard.next();
   },
- async (ctx) => {
+  async (ctx) => {
     ctx.scene.state.cryptocurrancy = ctx.message.text;
-    await ctx.reply("✍ Write the set price in the notice:");
+    await ctx.reply('✍ Write the set price in the notice:');
     ctx.wizard.next();
   },
   async (ctx) => {
@@ -16,12 +19,16 @@ export const wizardSceneDelete = new Scenes.WizardScene(
     const price = +ctx.message.text;
     const cryptocurrancy = ctx.scene.state.cryptocurrancy;
     try {
-      const data = deleteUserInfo(cryptocurrancy,price,id)
-      await DB("deleteData",data, "users");
-      await ctx.reply("✅Notification has been removed.");
+      const data = deleteUserInfo(cryptocurrancy, price, id);
+      await db('deleteData', data, UserNotification);
+      await ctx.reply('✅Notification has been removed.');
+      logger.info(`the deleteNotifications is completed.  User:${ctx.from.id}`);
       ctx.scene.leave();
-    } catch (err) {
+    } catch (error) {
       await ctx.reply(`😓Sorry,We have problem in our application.`);
+      logger.error(
+        `there is an error in the deleteNotification  ${error.message}. User:${ctx.from.id}`
+      );
       ctx.scene.leave();
     }
   }

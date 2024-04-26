@@ -1,17 +1,20 @@
 import "dotenv/config";
 import { Markup, Scenes } from "telegraf";
-import { listAllOrders } from "../../api.js";
-import { DB, findUserInfo } from "../db.js";
+import { listAllOrders } from "../api.js";
+import { db } from "../db/connection.js";
+import { findUserInfo } from "../db/utils.js";
 import { getDate } from "../date.js";
+import { ApiKey } from "../db/models/apiKeys.js";
+import { logger } from "../logs/logger.js";
 export const listOrdersScene = new Scenes.WizardScene(
-  "listAllOrders",
+  'listAllOrders',
   async (ctx) => {
-    await ctx.reply("✍Write status order 'active' or 'done': ");
+    await ctx.reply("✍Write status order \'active' or 'done': ");
     ctx.wizard.next();
   },
   async (ctx) => {
     const status = ctx.message.text;
-    if (status == "active" || status == "done") {
+    if (status == 'active' || status == 'done') {
       ctx.scene.state.status = status;
       await ctx.reply(
         "✍You can find list orders for trade pair.\nWrite trade pair or 'next':"
@@ -28,7 +31,7 @@ export const listOrdersScene = new Scenes.WizardScene(
       ctx.scene.state.tradePair = tradePair;
       ctx.reply("✍Write kind of orders 'buy' or 'sell':");
       ctx.wizard.next();
-    } else if (ctx.message.text == "next") {
+    } else if (ctx.message.text == 'next') {
       await ctx.reply("✍Write kind of orders 'buy' or 'sell' or 'all':");
       ctx.wizard.next();
     } else {
@@ -37,13 +40,13 @@ export const listOrdersScene = new Scenes.WizardScene(
       );
     }
   },
-  (ctx) => {
+ async (ctx) => {
     const kindOfOrders = ctx.message.text;
-    if (kindOfOrders == "buy" || kindOfOrders == "sell") {
+    if (kindOfOrders == 'buy' || kindOfOrders == 'sell') {
       ctx.scene.state.kindOfOrders = kindOfOrders;
       await ctx.reply("✍Write type of orders'limit' or 'market' or 'all':");
       ctx.wizard.next();
-    } else if (kindOfOrders == "all") {
+    } else if (kindOfOrders == 'all') {
      await  ctx.reply("✍Write type of orders'limit' or 'market' or 'all':");
       ctx.wizard.next();
     } else {
@@ -52,24 +55,24 @@ export const listOrdersScene = new Scenes.WizardScene(
   },
   async (ctx) => {
     const typeOfOrders = ctx.message.text;
-    if (typeOfOrders == "limit" || typeOfOrders == "market") {
+    if (typeOfOrders == 'limit' || typeOfOrders == 'market') {
       ctx.scene.state.typeOfOrders = typeOfOrders;
       await ctx.reply(
-        "🤔Select type of trading",
+        '🤔Select type of trading',
         Markup.inlineKeyboard([
-          [Markup.button.callback("💥Spot Trading", "spot")],
-          [Markup.button.callback("💥Cross Margin Trading", "margin")],
-          [Markup.button.callback("💥Isolated Margin Trading", "isMargin")],
+          [Markup.button.callback('💥Spot Trading', 'spot')],
+          [Markup.button.callback('💥Cross Margin Trading', 'margin')],
+          [Markup.button.callback('💥Isolated Margin Trading', 'isMargin')],
         ])
       );
       ctx.wizard.next();
-    } else if (typeOfOrders == "all") {
+    } else if (typeOfOrders == 'all') {
       await ctx.reply(
-        "🤔Select type of trading",
+        '🤔Select type of trading',
         Markup.inlineKeyboard([
-          [Markup.button.callback("💥Spot Trading", "spot")],
-          [Markup.button.callback("💥Cross Margin Trading", "margin")],
-          [Markup.button.callback("💥Isolated Margin Trading", "isMargin")],
+          [Markup.button.callback('💥Spot Trading', 'spot')],
+          [Markup.button.callback('💥Cross Margin Trading', 'margin')],
+          [Markup.button.callback('💥Isolated Margin Trading', 'isMargin')],
         ])
       );
       ctx.wizard.next();
@@ -80,24 +83,24 @@ export const listOrdersScene = new Scenes.WizardScene(
   async (ctx) => {
     const userPromt = ctx.message;
     if (userPromt) {
-      await ctx.reply("⛔ Please use the buttons to make a selection.");
+      await ctx.reply('⛔ Please use the buttons to make a selection.');
     } else {
       switch (ctx.callbackQuery.data) {
-        case "spot":
-          ctx.scene.state.typeOfTrading = "TRADE";
+        case 'spot':
+          ctx.scene.state.typeOfTrading = 'TRADE';
           break;
-        case "margin":
-          ctx.scene.state.typeOfTrading = "MARGIN_TRADE";
+        case 'margin':
+          ctx.scene.state.typeOfTrading = 'MARGIN_TRADE';
           break;
-        case "isMargin":
-          ctx.scene.state.typeOfTrading = "MARGIN_ISOLATED_TRADE";
+        case 'isMargin':
+          ctx.scene.state.typeOfTrading = 'MARGIN_ISOLATED_TRADE';
           break;
       }
       const params = ctx.scene.state;
       const data = findUserInfo(ctx.from.id);
 
       try {
-        const responce = await DB("getData", data,"usersKey");
+        const responce = await db('getData', data, ApiKey);
         const orders = await listAllOrders(
           responce[0].apiSecret,
           responce[0].apiKey,
@@ -106,7 +109,7 @@ export const listOrdersScene = new Scenes.WizardScene(
         );
 
         if (orders.length === 0) {
-          await ctx.reply("❗You haven't orders with the given params.");
+          await ctx.reply('❗You haven\'t orders with the given params.');
         } else {
           for (const order of orders) {
             const time = getDate(order.createdAt);
@@ -122,11 +125,13 @@ export const listOrdersScene = new Scenes.WizardScene(
             ➤ tradeType:${order.tradeType}`);
           }
         }
+        logger.info(`the sixth step in the listAllOrders is completed.  User:${ctx.from.id}`);
         ctx.scene.leave();
-      } catch (err) {
+      } catch (error) {
         await ctx.reply(
           `😓Sorry,something went wrong, make sure that the registration data is written correctly `
         );
+        logger.error(`there is an error in the sixth step of listAllOrders ${error.message}. User:${ctx.from.id}`)
         ctx.scene.leave();
       }
     }

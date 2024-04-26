@@ -1,15 +1,28 @@
-import axios from "axios";
-import { createHmac } from "./lib/crypto.js";
-export const pricesCryptoCurrancy = async (ticker) => {
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ticker}&vs_currencies=usd`;
-  const { data } = await axios.get(url, {
-    headers: { "Content-Type": "application/json" },
-  });
-  const usdValue = Object.values(data).find((obj) => typeof obj === "object")?.usd;
-  return usdValue;
+import axios from 'axios';
+import { createHmac } from '../lib/crypto.js';
+
+export const cryptocurrencyPrice = async (ticker) => {
+  try {
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ticker}&vs_currencies=usd`;
+    const { data } = await axios.get(url, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const usdValue = Object.values(data).find(
+      (obj) => typeof obj === 'object'
+    )?.usd;
+    return usdValue;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
-export const openOrder = async (apiSecret,apiKey,passphrase,params,apiText) => {
+export const openOrder = async (
+  apiSecret,
+  apiKey,
+  passphrase,
+  params,
+  apiText
+) => {
   const url = `https://api.kucoin.com/api/v1/${apiText}`;
   const now = Date.now();
   const {
@@ -21,30 +34,41 @@ export const openOrder = async (apiSecret,apiKey,passphrase,params,apiText) => {
     price,
     cryptoCurrancy,
   } = params;
-  const priceCurrancyUSDT = await pricesCryptoCurrancy(cryptoCurrancy);
-  const totalPrice = String((size / priceCurrancyUSDT).toFixed(8));
-  const data = {
-    clientOid: clientOid,
-    side: kindOrder,
-    symbol: tradePair,
-    type: "market",
-    funds: size,
-  };
-  if (typeOfTrading == "limit") {
-    delete data.funds;
-    data.type = typeOfTrading;
-    data.price = price;
-    data.size = totalPrice;
+  try {
+    const priceCurrancyUSDT = await cryptocurrencyPrice(cryptoCurrancy);
+    const totalPrice = String((size / priceCurrancyUSDT).toFixed(8));
+    const data = {
+      clientOid: clientOid,
+      side: kindOrder,
+      symbol: tradePair,
+      type: 'market',
+      funds: size,
+    };
+    if (typeOfTrading == 'limit') {
+      delete data.funds;
+      data.type = typeOfTrading;
+      data.price = price;
+      data.size = totalPrice;
+    }
+
+    const dataJson = JSON.stringify(data);
+    const strToSign = now + 'POST' + `/api/v1/${apiText}` + dataJson;
+    const headers = createHmac(
+      apiSecret,
+      strToSign,
+      apiKey,
+      passphrase,
+      now,
+      'application/json'
+    );
+    await axios.post(url, dataJson, { headers: headers });
+  } catch (error) {
+    throw new Error(error);
   }
-  
-  const dataJson = JSON.stringify(data);
-  const strToSign = now + "POST" + `/api/v1/${apiText}` + dataJson;
-  const headers = createHmac(apiSecret,strToSign,apiKey,passphrase,now,"application/json");
-  await axios.post(url, dataJson, { headers:headers});
 };
 
 export const withdraw = async (apiSecret, apiKey, passPhrase, params) => {
-  const url = "https://api.kucoin.com/api/v1/withdrawals";
+  const url = 'https://api.kucoin.com/api/v1/withdrawals';
   const now = new Date();
   const { currancy, withdrawalAddress, amount } = params;
   data = {
@@ -54,16 +78,27 @@ export const withdraw = async (apiSecret, apiKey, passPhrase, params) => {
   };
 
   const dataJson = JSON.stringify(data);
-  const strToSign = now + "POST" + "/api/v1/withdrawals" + dataJson;
-  const headers = createHmac(apiSecret,strToSign,apiKey,passPhrase,now,"application/json");
+  const strToSign = now + 'POST' + '/api/v1/withdrawals' + dataJson;
 
-  await axios.post(url, dataJson, { headers: headers });
+  const headers = createHmac(
+    apiSecret,
+    strToSign,
+    apiKey,
+    passPhrase,
+    now,
+    'application/json'
+  );
+  try {
+    await axios.post(url, dataJson, { headers: headers });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const listAllOrders = async (apiSecret, apiKey, passPhrase, params) => {
-  let url = "https://api.kucoin.com/api/v1/orders?";
+  let url = 'https://api.kucoin.com/api/v1/orders?';
   const now = Date.now();
-  let strSign = "/api/v1/orders?";
+  let strSign = '/api/v1/orders?';
   const { status, tradePair, kindOfOrders, typeOfOrders, typeOfTrading } =
     params;
 
@@ -75,7 +110,9 @@ export const listAllOrders = async (apiSecret, apiKey, passPhrase, params) => {
     tradeType: typeOfTrading,
   };
 
-  Object.keys(data).forEach((key) => data[key] === undefined && delete data[key]);
+  Object.keys(data).forEach(
+    (key) => data[key] === undefined && delete data[key]
+  );
   let isFirst = true;
   for (const [key, value] of Object.entries(data)) {
     if (isFirst) {
@@ -88,10 +125,14 @@ export const listAllOrders = async (apiSecret, apiKey, passPhrase, params) => {
     }
   }
 
-  const strToSign = now + "GET" + strSign;
-  const headers = createHmac(apiSecret,strToSign,apiKey,passPhrase,now);
-  const response = await axios.get(url, { headers: headers });
-  return response.data.data.items;
+  const strToSign = now + 'GET' + strSign;
+  const headers = createHmac(apiSecret, strToSign, apiKey, passPhrase, now);
+  try {
+    const response = await axios.get(url, { headers: headers });
+    return response.data.data.items;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const cancelOrder = async (dataAuth, orderId) => {
@@ -99,7 +140,11 @@ export const cancelOrder = async (dataAuth, orderId) => {
   const now = Date.now();
   const { apiSecret, apiKey, passPhrase } = dataAuth;
 
-  const strToSign = now + "DELETE" + `/api/v1/orders/${orderId}`;
-  const headers = createHmac(apiSecret,strToSign,apiKey,passPhrase,now);
-  await axios.delete(url, { headers: headers });
+  const strToSign = now + 'DELETE' + `/api/v1/orders/${orderId}`;
+  const headers = createHmac(apiSecret, strToSign, apiKey, passPhrase, now);
+  try {
+    await axios.delete(url, { headers: headers });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
