@@ -13,9 +13,9 @@ export const SceneTradingAuthorization = new Scenes.WizardScene(
     const data = findUserInfo(ctx.from.id);
     try {
       const res = await db('getData', data, ApiKey);
-      if (res.length <= 0) {
+      if (res.length == 0) {
         await ctx.reply(
-          'For introducing with с API Kucoin.\n✍Write passphrase:'
+          `For introducing with с API Kucoin.\n✍Write passphrase:\n ✍Add this IP:${process.env.IP_SERVER} to the access list`
         );
         ctx.wizard.next();
       } else {
