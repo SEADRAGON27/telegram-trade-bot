@@ -18,7 +18,7 @@ export const wizardSceneTrade = new Scenes.WizardScene(
   },
   async (ctx) => {
     const userInput = ctx.message;
-
+    console.log('ffff',userInput);
     if (userInput) {
       await ctx.reply('⛔ Please use the buttons to make a selection.');
     } else {
@@ -39,7 +39,7 @@ export const wizardSceneTrade = new Scenes.WizardScene(
           await ctx.scene.enter('changeDataAuth');
           break;
       }
-      ctx.scene.leave();
+      
     }
   }
 );

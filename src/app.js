@@ -11,8 +11,15 @@ import { withdrawScene } from './tradingScenes/withdraw.js';
 import { listOrdersScene } from './tradingScenes/listAllOrders.js';
 import { cancelOrdersScene } from './tradingScenes/cancelOrder.js';
 import { changeDataAuthScene } from './tradingScenes/changeDataAuth.js';
+import mongoose from 'mongoose';
+import { logger } from './logs/logger.js';
 
 function startBot() {
+  
+  mongoose.connect(process.env.CONECTION_DBD)
+  .then(() => logger.info('Connection successed')
+  ).catch(() => logger.warn('Connection unsuccessed'))
+
   const bot = new Telegraf(process.env.BOT_TOKEN);
   const stage = new Scenes.Stage([
     wizardScenePrice,
@@ -26,12 +33,13 @@ function startBot() {
     cancelOrdersScene,
     changeDataAuthScene,
   ]);
+  
   bot.use(session());
   bot.use(stage.middleware());
 
   bot.command('start', async (ctx) => {
     await ctx.reply(
-      'Welcome, select a option:',
+      'Welcome, select an option:',
       Markup.inlineKeyboard([
         [Markup.button.callback('💵Get prices of cryptocurrencies', 'prices')],
         [

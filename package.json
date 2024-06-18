@@ -5,14 +5,14 @@
   "description": "pet project for github",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
   "author": "Nikita",
   "license": "ISC",
   "dependencies": {
-    "argon2": "^0.40.1",
     "axios": "^1.4.0",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
     "mongodb": "^5.7.0",
     "mongoose": "^8.3.2",

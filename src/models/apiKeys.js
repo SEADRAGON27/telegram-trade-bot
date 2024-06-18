@@ -6,7 +6,7 @@ const apiKeySchema = mongoose.Schema({
         required:true
     },
     
-    passPhrase:{
+    password:{
         type:String,
         required:true
     },

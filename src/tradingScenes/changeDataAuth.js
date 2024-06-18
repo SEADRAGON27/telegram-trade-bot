@@ -1,13 +1,13 @@
 import 'dotenv/config';
 import { Markup, Scenes } from 'telegraf';
-import { db } from '../db/connection.js';
-import { findUserInfo } from '../db/utils.js';
-import { ApiKey } from '../db/models/apiKeys.js';
+import { ApiKey } from '../models/apiKeys.js';
 import { logger } from '../logs/logger.js';
 
 export const changeDataAuthScene = new Scenes.WizardScene(
   'changeDataAuth',
+ 
   async (ctx) => {
+    
     await ctx.reply(
       'Select data which would you change.',
       Markup.inlineKeyboard([
@@ -16,13 +16,19 @@ export const changeDataAuthScene = new Scenes.WizardScene(
         [Markup.button.callback('💥Passphrase', 'phrase')],
       ])
     );
+    
     ctx.wizard.next();
   },
   async (ctx) => {
+    
     const userPromt = ctx.message;
+    
     if (userPromt) {
+      
       await ctx.reply('⛔ Please use the buttons to make a selection.');
+    
     } else {
+      
       switch (ctx.callbackQuery.data) {
         case 'secret':
           ctx.scene.state.secret = 'secret';
@@ -33,42 +39,51 @@ export const changeDataAuthScene = new Scenes.WizardScene(
           await ctx.reply('✍Write a new api key:');
           break;
         case 'phrase':
-          ctx.scene.state.passPhrase = 'phrase';
-          await ctx.reply('✍Write a new passphrase:');
+          ctx.scene.state.password = 'password';
+          await ctx.reply('✍Write a new password:');
           break;
       }
+      
       ctx.wizard.next();
     }
   },
   async (ctx) => {
+    
     const newData = ctx.message.text;
     const typeAuth = ctx.scene.state;
-    const data = findUserInfo(ctx.from.id);
+    
     try {
-      const res = await db('getData', data, ApiKey);
+      const res = await ApiKey.find({userId:ctx.from.id})
+      
       if (Object.hasOwn(typeAuth, 'secret')) {
-        await db('updateData', { $set: { apiSecret: newData } }, ApiKey, {
-          _id: res[0]._id,
-        });
+        
+        await ApiKey.updateOne( {_id: res[0]._id,},{ $set: { apiSecret: newData } })
+        
         await ctx.reply('✅Api secret is changed');
       }
       if (Object.hasOwn(typeAuth, 'key')) {
-        db('updateData', { $set: { apiKey: newData } }, ApiKey, {
-          _id: res[0]._id,
-        });
+       
+        await ApiKey.updateOne( {_id: res[0]._id,},{ $set: { apiKey: newData } })
+        
         await ctx.reply('✅Api key is changed');
+      
       }
-      if (Object.hasOwn(typeAuth, 'passPhrase')) {
-        await db('updateData', { $set: { passPhrase: newData } }, ApiKey, {
-          _id: res[0]._id,
-        });
+      
+      if (Object.hasOwn(typeAuth, 'password')) {
+       
+        await ApiKey.updateOne( {_id: res[0]._id,},{ $set: { password: newData } })
+        
         await ctx.reply('✅Passphrase is changed');
+      
       }
+      
       logger.info(
         `the fourth step in the changeDataAuth is completed.  User:${ctx.from.id}`
       );
       ctx.scene.leave();
+    
     } catch (error) {
+      
       await ctx.reply(
         `😓Sorry,something went wrong, make sure that you are registrated in our bot`
       );
@@ -76,6 +91,7 @@ export const changeDataAuthScene = new Scenes.WizardScene(
         `there is an error in the fourth step of cancelOrders ${error.message}. User:${ctx.from.id}`
       );
       ctx.scene.leave();
+    
     }
   }
 );

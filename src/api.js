@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createHmac } from '../lib/crypto.js';
+import { createHmac } from './utils/crypto.js';
 
 export const cryptocurrencyPrice = async (ticker) => {
   try {
@@ -113,6 +113,7 @@ export const listAllOrders = async (apiSecret, apiKey, passPhrase, params) => {
   Object.keys(data).forEach(
     (key) => data[key] === undefined && delete data[key]
   );
+ 
   let isFirst = true;
   for (const [key, value] of Object.entries(data)) {
     if (isFirst) {
@@ -126,9 +127,14 @@ export const listAllOrders = async (apiSecret, apiKey, passPhrase, params) => {
   }
 
   const strToSign = now + 'GET' + strSign;
+  console.log(strToSign)
   const headers = createHmac(apiSecret, strToSign, apiKey, passPhrase, now);
+ 
   try {
-    const response = await axios.get(url, { headers: headers });
+    
+    const response = await axios.get(url, { headers:headers });
+   
+    console.log(response.data.data.items)
     return response.data.data.items;
   } catch (error) {
     throw new Error(error);

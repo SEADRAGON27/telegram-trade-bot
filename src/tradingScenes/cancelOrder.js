@@ -1,9 +1,7 @@
 import 'dotenv/config';
 import { Markup, Scenes } from 'telegraf';
 import { listAllOrders, cancelOrder } from '../api.js';
-import { db } from '../db/connection.js';
-import { findUserInfo } from '../db/utils.js';
-import { ApiKey } from '../db/models/apiKeys.js';
+import { ApiKey } from '../models/apiKeys.js';
 import { getDate } from '../date.js';
 import { logger } from '../logs/logger.js';
 
@@ -22,10 +20,15 @@ export const cancelOrdersScene = new Scenes.WizardScene(
   },
 
   async (ctx) => {
+    
     const userPromt = ctx.message;
+    
     if (userPromt) {
+      
       await ctx.reply('⛔ Please use the buttons to make a selection.');
+    
     } else {
+      
       ctx.scene.state.status = 'active';
       ctx.scene.state.typeOfOrders = 'limit';
 
@@ -42,19 +45,26 @@ export const cancelOrdersScene = new Scenes.WizardScene(
       }
 
       const params = ctx.scene.state;
-      const data = findUserInfo(ctx.from.id);
+      
+      
       try {
-        const responce = await db('getData', data, ApiKey);
+       
+        const responce = ApiKey.find({userId:ctx.from.id})
+        
         const orders = await listAllOrders(
           responce[0].apiSecret,
           responce[0].apiKey,
-          responce[0].passPhrase,
+          responce[0].password,
           params
         );
+        
         if (orders.length === 0) {
+          
           await ctx.reply("❗You haven't orders with the given params.");
           ctx.scene.leave();
+        
         } else {
+          
           for (const order of orders) {
             const time = getDate(order.createdAt);
             await ctx.reply(` ➤ order Id:${order.id}
@@ -70,7 +80,7 @@ export const cancelOrdersScene = new Scenes.WizardScene(
 
             ctx.scene.state.apiSecret = responce[0].apiSecret;
             ctx.scene.state.apiKey = responce[0].apiKey;
-            ctx.scene.state.passPhrase = responce[0].passPhrase;
+            ctx.scene.state.password = responce[0].password;
             await ctx.reply('✍Write order id which you want to cancel:');
             logger.info(
               `the second step in the cancelOrders is completed.  User:${ctx.from.id}`
@@ -78,7 +88,9 @@ export const cancelOrdersScene = new Scenes.WizardScene(
             ctx.wizard.next();
           }
         }
+      
       } catch (error) {
+        
         await ctx.reply(
           `😓Sorry,something went wrong, make sure that the registration data is written correctly.`
         );
@@ -86,11 +98,14 @@ export const cancelOrdersScene = new Scenes.WizardScene(
           `there is an error in the second step of cancelOrders ${error}. User:${ctx.from.id}`
         );
         ctx.scene.leave();
+      
       }
     }
   },
   async (ctx) => {
+    
     try {
+      
       const orderId = ctx.message.text;
       const data = ctx.scene.state;
       await cancelOrder(data, orderId);
@@ -99,12 +114,15 @@ export const cancelOrdersScene = new Scenes.WizardScene(
         `the third step in the cancelOrders is completed.  User:${ctx.from.id}`
       );
       ctx.scene.leave();
+    
     } catch (error) {
+      
       ctx.reply('😓Sorry,We have problem in our application.');
       logger.error(
         `there is an error in the third step of cancelOrders ${error.message}. User:${ctx.from.id}`
       );
       ctx.scene.leave();
+    
     }
   }
 );
