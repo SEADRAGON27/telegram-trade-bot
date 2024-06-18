@@ -9,6 +9,7 @@ export const SceneTradingAuthorization = new Scenes.WizardScene(
   async (ctx) => {
     
     try {
+<<<<<<< HEAD
       
       const res = await ApiKey.find({userId:ctx.from.id});
     
@@ -16,6 +17,12 @@ export const SceneTradingAuthorization = new Scenes.WizardScene(
         
         await ctx.reply(
           `For introducing with с API Kucoin.\n✍Write password:\n ✍Add this IP ${process.env.SERVER} to the access list.`
+=======
+      const res = await db('getData', data, ApiKey);
+      if (res.length == 0) {
+        await ctx.reply(
+          `For introducing with с API Kucoin.\n✍Write passphrase:\n ✍Add this IP:${process.env.IP_SERVER} to the access list`
+>>>>>>> 6d99b0aad5670d2bd4c171ad5ac98053775b4d99
         );
         ctx.wizard.next();
       
