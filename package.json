@@ -6,11 +6,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node src/app.js",
-<<<<<<< HEAD
     "dev": "nodemon src/app.js"
-=======
-    "dev": "nodemon src/app.js",
->>>>>>> 6d99b0aad5670d2bd4c171ad5ac98053775b4d99
   },
   "author": "Nikita",
   "license": "ISC",
